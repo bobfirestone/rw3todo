@@ -1,7 +1,11 @@
 Rw3todo::Application.routes.draw do
+  match "about" => 'pages#about', as: "about"
+  match '/completed' => 'todos#completed', :as => :completed
   devise_for :users
 
-  resources :todos
+  resources :todos do
+    resources :notes
+  end
 
   # The priority is based upon order of creation:
   # first created -> highest priority.

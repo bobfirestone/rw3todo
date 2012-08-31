@@ -96,6 +96,12 @@ OVERVIEW
     in app/helpers create file bootstrap_flash_helper.rb and copy code from 
     https://github.com/seyhunak/twitter-bootstrap-rails/blob/master/app/helpers/bootstrap_flash_helper.rb
     into the new file
+3.11 Another deploy problem is the favicon_link_tags. Delete them all
+  app/views/layouts/appliation.html.erb
+    <!-- For third-generation iPad with high-resolution Retina display: -->
+    <!-- Size should be 144 x 144 pixels -->
+    <%= favicon_link_tag 'images/apple-touch-icon-144x144-precomposed.png', :rel => 'apple-touch-icon-precomposed', :type => 'image/png', :sizes => '144x144' %>
+
 
 4. CREATEING USER ACCOUNTS
 4.1 The Devise Gem
@@ -107,16 +113,20 @@ OVERVIEW
 
 4.3 FOLLOW THE DEVISE INSTRUCTIONS
 
-  ROOT URL
-    config/routes.rb (line 53)
-      root :to => 'todos#index'
+4.3.1 ROOT URL
+  config/routes.rb (line 53)
+    root :to => 'todos#index'
 
-    remove public/index.html
+  remove public/index.html
 
-  FLASH MESSAGES // There is a helper in twitter bootstrap that handles this functionality
-    app/views/layouts/application.html.erb
-      <p class="notice"><%= notice %></p>
-      <p class="alert"><%= alert %></p>
+4.3.2 FLASH MESSAGES // There is a helper in twitter bootstrap that handles this functionality
+  app/views/layouts/application.html.erb
+    <p class="notice"><%= notice %></p>
+    <p class="alert"><%= alert %></p>
+
+4.3.3 Initialize assets on precompile
+  config/application.rb (below enable asset pipeline line 57)
+    config.assets.initialize_on_precompile = false
 
 4.4 CREATE OUR USERS
   $ rails g devise User
@@ -200,7 +210,7 @@ OVERVIEW
   app/views/pages/about.html.erb
     Put what ever you want here
 8.3 Add link to about page to top nav menu
-  app/views/layout/application.html.erb (about line 52)
+  app/views/layout/application.html.erb (about line 33)
     Change
     <li><%= link_to "Link3", "/path3"  %></li>
     To
@@ -216,6 +226,8 @@ OVERVIEW
 9.0 Add description to todos
 9.1 Create migration for adding description to todos
   $ rails g migration add_description_to_todos description:text
+9.2 Migrate the DB
+  $ bundle exec rake db:migrate
 9.2 Add :description to attr_accessible
   app/models/todo.rb
     attr_accessible :title, :description
@@ -256,8 +268,8 @@ OVERVIEW
 10.5 ADD SOME NOTES IN THE CONSOLE
   $ rails console
 
-  > t = Todo.first
-  > n = Note.create(content: "It's a note", todo_id: 1)
+  > t = Todo.last
+  > n = Note.create(content: "It's a note", todo_id: 5)
 
   View the page and the note should be there
   > exit
@@ -266,7 +278,7 @@ OVERVIEW
 
   stop the server "ctrl-c"
   $ rails console
-  > t = Todo.first
+  > t = Todo.last
   > x = t.notes.build(content: "note made by build")
   > x.save
 
@@ -397,7 +409,7 @@ OVERVIEW
   config/routes.rb
     match '/completed' => 'todos#completed', :as => :completed
 12.10 Links for open and completed page for signed in users
-  app/layouts/application.html.erb (line 50)
+  app/layouts/application.html.erb (line 31)
     <% if user_signed_in? %>
       <li><%= link_to "Open", todos_path  %></li>
       <li><%= link_to "Completed", completed_path  %></li>

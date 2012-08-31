@@ -6,8 +6,32 @@
 <dl class="dl-horizontal">
   <dt><strong><%= model_class.human_attribute_name(:title) %>:</strong></dt>
   <dd><%= @todo.title %></dd>
+  <dt><strong><%= model_class.human_attribute_name(:status) %>:</strong></dt>
+  <% if @todo.status? %>
+    <dd>Open</dd>
+  <% else %>  
+    <dd>Closed</dd>
+  <% end %>
+  <dt><strong><%= model_class.human_attribute_name(:priority) %>:</strong></dt>
+  <dd><%= @todo.priority %></dd>
+  <dt><strong><%= model_class.human_attribute_name(:description) %>:</strong></dt>
+  <dd><%= @todo.description %></dd>
 </dl>
+<div>
+  <h3>Notes</h3>
+  <ul>
+    <% @todo.notes.each do |note| %>
+      <li><%= note.content %> <em><%= note.created_at %><em></li>
+    <% end %>
+  </ul>
+  <%= form_for([@todo, @todo.notes.build]) do |f| %>
+    <%= f.label :content, "Add a Note" %>
+    <%= f.text_field :content %>
+    
+    <%= f.submit %>
+  <% end %>
 
+</div>
 <div class="form-actions">
   <%= link_to t('.back', :default => t("helpers.links.back")),
               todos_path, :class => 'btn'  %>
