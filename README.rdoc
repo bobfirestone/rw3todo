@@ -185,7 +185,7 @@ OVERVIEW
   $ git init .
   $ git add .
   $ git commit -m "Initial Commit"
-  $ heroku create --stack cedar
+  $ heroku create
      Enter in the credentials you signed up with.
      The url of the app will be given to you after the app has been created.
   $ git push heroku master
