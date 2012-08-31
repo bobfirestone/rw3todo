@@ -35,6 +35,7 @@ OVERVIEW
   ctrl + c
 
 2.0 CREATE BASIC TODOS
+
 2.1 SCAFFOLD TODO
   $ rails g scaffold todo title
 2.2 MIGRATE THE DATABASE
@@ -103,7 +104,8 @@ OVERVIEW
     <%= favicon_link_tag 'images/apple-touch-icon-144x144-precomposed.png', :rel => 'apple-touch-icon-precomposed', :type => 'image/png', :sizes => '144x144' %>
 
 
-4. CREATEING USER ACCOUNTS
+4.0 CREATEING USER ACCOUNTS
+
 4.1 The Devise Gem
   Gemfile
     gem 'devise'
@@ -156,11 +158,13 @@ OVERVIEW
     sign out then sign back in.
 
 5.0 RESTRICT ACCESS TO LOGGEDIN USERS
+
 5.1 AUTHENTICATE USERS
     app/controllers/todos_controller.rb
       before_filter :authenticate_user!
 
 6.0 ATTACH TODOS TO SPECIFIC USERS
+
 6.1 Active record relations
   app/models/user.rb
     has_many :todos
@@ -179,7 +183,9 @@ OVERVIEW
 6.5 Start server and add a couple of todos to account
 
 7.0 DEPLOY TO HEROKU
+
 7.1 Signup at https://api.heroku.com/signup
+
 7.2 modify gem file for deploy
   Gemfile
     group :development do
@@ -204,17 +210,21 @@ OVERVIEW
 7.3 Go to app page. Congratulations you have deployed a rails app.
 
 8.0 Static page(s)
+
 8.1 ADD ABOUT PAGE
   $ rails g controller pages about
+
 8.2 Modify your about page view
   app/views/pages/about.html.erb
     Put what ever you want here
+
 8.3 Add link to about page to top nav menu
   app/views/layout/application.html.erb (about line 33)
     Change
     <li><%= link_to "Link3", "/path3"  %></li>
     To
     <li><%= link_to "About", about_path  %></li>
+
 8.4 Routing for about page
   config/routes.rb
     Change
@@ -224,14 +234,17 @@ OVERVIEW
 
 
 9.0 Add description to todos
+
 9.1 Create migration for adding description to todos
   $ rails g migration add_description_to_todos description:text
+
 9.2 Migrate the DB
   $ bundle exec rake db:migrate
-9.2 Add :description to attr_accessible
+
+9.3 Add :description to attr_accessible
   app/models/todo.rb
     attr_accessible :title, :description
-9.3 Add description to form
+9.4 Add description to form
   app/views/todos/_form.html.erb
     <div class="control-group">
       <%= f.label :description, :class => 'control-label' %>
@@ -239,22 +252,26 @@ OVERVIEW
         <%= f.text_area :description, :class => 'text_area' %>
       </div>
     </div>
-9.4 Add description to todo show page
+9.5 Add description to todo show page
   app/views/todos/show.rb
     <dt><strong><%= model_class.human_attribute_name(:description) %>:</strong></dt>
     <dd><%= @todo.description %></dd>
 
 10.0 Add notes to todos
+
 10.1 Create note model
   $ rails g model note content:text todo_id:integer
+
 10.2 Migrate DB changes
   $ bundle exec rake db:migrate
+
 10.3 ACTIVE RECORD ASSOCIATIONS
   model/todo.rb
     has_many :notes
 
   model/note.rb
     belongs_to :todo
+
 10.4 SHOW TODO NOTES ON TODO PAGE
   views/todos/show.html.erb
     <div>
@@ -265,6 +282,7 @@ OVERVIEW
         <% end %>
       </ul>
     </div>
+
 10.5 ADD SOME NOTES IN THE CONSOLE
   $ rails console
 
@@ -334,10 +352,13 @@ OVERVIEW
     validates_presence_of :content
 
 11.0 Add priority to todos
+
 11.1 Create mogration adding priority to todos
   $ rails g migration add_priority_to_todos priority:integer
+
 11.2 Rake the DB
   $ bundle exec rake db:migrate
+
 11.3 Make priority attr_accessible
   model/todo.rb
     attr_accessible :title, :description, :priority
@@ -350,32 +371,39 @@ OVERVIEW
         <%= f.text_field :priority, :class => 'text_field' %>
       </div>
     </div>
+
 11.5 Add priority to index
   views/todos/index.html.erb
     In the thead section
       <th><%= model_class.human_attribute_name(:priority) %></th>
     In the tbody
       <td><%= todo.priority %></td>
+
 11.6 Add priority to show
   views/todos/show.html.erb
     <dt><strong><%= model_class.human_attribute_name(:priority) %>:</strong></dt>
     <dd><%= @todo.priority %></dd>
+
 11.7 Set default sort to priority high to low
   model/todo.rb
     default_scope order("priority DESC")
     
-
 12.0 Adding status to todos
+
 12.1 Generate DB migration
   $ rails g migration add_status_to_todos status:boolean
+
 12.2 Set migration to defualt status to true
   db/migrate/#####_add_status_to_todos
     add_column :todos, :status, :boolean, default: true
+
 12.3 Migrate DB
   $ bundle exec rake db:migrate
+
 12.4 Make status accessible
   app/models/todo.rb
     attr_accessible :status
+
 12.5 Add status to todo form
   app/views/todos/_form.html.erb
     <div class="control-group">
@@ -385,6 +413,7 @@ OVERVIEW
         <%= radio_button("todo", "status", "false") %> Closed
       </div>
     </div>
+
 12.6 Add status to todo show
   app/views/todos/show
     <dt><strong><%= model_class.human_attribute_name(:status) %>:</strong></dt>
@@ -393,21 +422,25 @@ OVERVIEW
     <% else %>  
       <dd>Closed</dd>
     <% end %>
+
 12.7 Filter todos index to only show open todos
   app/controllers/todos_controller.rb
     def index
       @todos = current_user.todos.find_all_by_status(true)
       ...
     end
+
 12.8 A separate page for showing completed todos
   app/controllers/todos_controller.rb
     def completed
       @todos = Todo.find_all_by_status(false)
       render :index
     end
+
 12.9 Routing for complete todos page
   config/routes.rb
     match '/completed' => 'todos#completed', :as => :completed
+
 12.10 Links for open and completed page for signed in users
   app/layouts/application.html.erb (line 31)
     <% if user_signed_in? %>
@@ -416,12 +449,16 @@ OVERVIEW
     <% end %>
 
 13.0 Cleanup views/todos/index.html.erb
+
 13.1 Order the table status, title, priority, created_at, actions
+
 13.2 Status
   line 8 <th><%= model_class.human_attribute_name(:status) %></th>
   line 18 <td><%= todo.status? ? "Open" : "Closed" %></td>
+
 13.3 Make title link to show view
   line 19 <td><%= link_to todo.title, todo_path(todo) %></td>
+
 13.4 Created at (pretty dates with stamp gem)
   Gemfile
     gem "stamp"
@@ -430,9 +467,14 @@ OVERVIEW
     line 20 <td><%= todo.created_at.stamp("July 4, 1776") %></td>
 
 14.0 Deploy completed app to heroku
+
 14.1 add files to git
   $ git add .
+
 14.2 commit changes to git
   $ git commit -am "Finished with rubyweekend app"
+
 14.3 Push to heroku
   $ git push heroku master
+
+15.0 Add features and try things on your own
