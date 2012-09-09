@@ -21,7 +21,7 @@
   <h3>Notes</h3>
   <ul>
     <% @todo.notes.each do |note| %>
-      <li><%= note.content %> <em><%= note.created_at %><em></li>
+      <li><%= note.content %> <br><em><%= note.created_at.stamp("July 4 '76") %></em></li>
     <% end %>
   </ul>
   <%= form_for([@todo, @todo.notes.build]) do |f| %>

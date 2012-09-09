@@ -1,4 +1,17 @@
 <%= form_for @todo, :html => { :class => 'form-horizontal' } do |f| %>
+  <% if @todo.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@todo.errors.count, "error") %> prohibited this number_form from being saved:</h2>
+
+      <ul>
+      <% @todo.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+
   <div class="control-group">
     <%= f.label :title, :class => 'control-label' %>
     <div class="controls">
@@ -15,7 +28,7 @@
   <div class="control-group">
     <%= f.label :priority, :class => 'control-label' %>
     <div class="controls">
-      <%= f.text_field :priority, :class => 'text_field' %>
+      <%= f.number_field :priority, :in => 1..10, :class => 'number_field' %>
     </div>
   </div>
   <div class="control-group">

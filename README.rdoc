@@ -82,8 +82,23 @@ OVERVIEW
   // this overwrites the master layout. answer y to the conflict message
 
 3.6 BOOTSTRAP OUR TODOS
+  Copy error message from todos/_form.html.erb
+    <% if @todo.errors.any? %>
+      <div id="error_explanation">
+        <h2><%= pluralize(@todo.errors.count, "error") %> prohibited this number_form from being saved:</h2>
+
+        <ul>
+        <% @todo.errors.full_messages.each do |msg| %>
+          <li><%= msg %></li>
+        <% end %>
+        </ul>
+      </div>
+    <% end %>
+
   $ rails g bootstrap:themed Todos
   // this overwrites the views for our todos
+
+  Paste error message into new todos/_form
 
 3.7 START THE SERVER
 
@@ -93,10 +108,12 @@ OVERVIEW
 3.9 Add alerts helper to layout
   app/layouts/application.html.erb (line 63 indide the div above the yield)
     <%= bootstrap_flash %>
+
 3.10 Fix a deploy problem with flash messages when deploying to heroku
     in app/helpers create file bootstrap_flash_helper.rb and copy code from 
-    https://github.com/seyhunak/twitter-bootstrap-rails/blob/master/app/helpers/bootstrap_flash_helper.rb
+    https://raw.github.com/seyhunak/twitter-bootstrap-rails/master/app/helpers/bootstrap_flash_helper.rb
     into the new file
+
 3.11 Another deploy problem is the favicon_link_tags. Delete them all
   app/views/layouts/appliation.html.erb
     <!-- For third-generation iPad with high-resolution Retina display: -->
@@ -108,7 +125,10 @@ OVERVIEW
 
 4.1 The Devise Gem
   Gemfile
-    gem 'devise'
+    gem 'devise', '2.1.2'
+
+  Kill server
+  $ bundle install
 
 4.2 INSTALL DEVISE
   $ rails g devise:install
@@ -138,14 +158,16 @@ OVERVIEW
 
 4.6 ADD SIGN IN AND SIGN UP LINKS
   inside the sidebar area, replace Link1 & Link2. Delete Link3
-    app/views/layouts/application.html.erb (line 71)
+    app/views/layouts/application.html.erb (inside the sidebar)
       <li><%= link_to "Sign Up", new_user_registration_path  %></li>
       <li><%= link_to "Sign In", new_user_session_path  %></li>
 
 4.7 SIGN UP FOR AN ACCOUNT!
-    how do you log out?
+    Restart the server
+      $ rails s
     
-4.8 UPDATE SIDEBAR
+    
+4.8 HOW DO YOU LOG OUT? - UPDATE SIDEBAR
   app/views/layouts/application.html.erb
     <% if user_signed_in? %>
       <li><%= link_to "Update Account", edit_registration_path(current_user) %></li>
@@ -154,6 +176,7 @@ OVERVIEW
       <li><%= link_to "Sign Up", new_user_registration_path  %></li>
       <li><%= link_to "Sign In", new_user_session_path  %></li>
     <% end %>
+
 4.9 REFRESH PAGE!
     sign out then sign back in.
 
@@ -173,13 +196,16 @@ OVERVIEW
     belongs_to :user
 
 6.2 Create migration to add user_id to todos table    
+  Kill server
   $ rails g migration add_user_id_to_todos user_id:integer
+
 6.3 Migrate changes in DB
   $ bundle exec rake db:migrate
+
 6.4 Modify todos_controller to only show user todos that belong to them
   app/controllers/todos_controller.rb
     replace all `Todo.` with `current_user.todos.`
-    NOTE: be sure the . is after the Todo if you "global find and replace". This ensures that the class name, and flash messages are untouched.
+    
 6.5 Start server and add a couple of todos to account
 
 7.0 DEPLOY TO HEROKU
@@ -230,8 +256,10 @@ OVERVIEW
     Change
       get "pages/about"
     To
-      match "about" => 'pages#about', as: "about"
+      match "/about" => 'pages#about'
 
+8.5 CHECK OUT YOUR PAGE
+  Restart server
 
 9.0 Add description to todos
 
@@ -240,10 +268,13 @@ OVERVIEW
 
 9.2 Migrate the DB
   $ bundle exec rake db:migrate
+  
+  Restart server
 
 9.3 Add :description to attr_accessible
   app/models/todo.rb
     attr_accessible :title, :description
+
 9.4 Add description to form
   app/views/todos/_form.html.erb
     <div class="control-group">
@@ -252,6 +283,7 @@ OVERVIEW
         <%= f.text_area :description, :class => 'text_area' %>
       </div>
     </div>
+
 9.5 Add description to todo show page
   app/views/todos/show.rb
     <dt><strong><%= model_class.human_attribute_name(:description) %>:</strong></dt>
@@ -287,7 +319,9 @@ OVERVIEW
   $ rails console
 
   > t = Todo.last
-  > n = Note.create(content: "It's a note", todo_id: 5)
+  Note the id
+
+  > n = Note.create(content: "It's a note", todo_id: #the id from t)
 
   View the page and the note should be there
   > exit
@@ -299,6 +333,12 @@ OVERVIEW
   > t = Todo.last
   > x = t.notes.build(content: "note made by build")
   > x.save
+
+  You can do other things to see the notes in the command line
+  > t.all
+  > t.first
+  > t.last
+  > t.count
 
   View the page again and the second note will be there
   > exit
@@ -368,7 +408,7 @@ OVERVIEW
     <div class="control-group">
       <%= f.label :priority, :class => 'control-label' %>
       <div class="controls">
-        <%= f.text_field :priority, :class => 'text_field' %>
+        <%= f.number_field :priority %>
       </div>
     </div>
 
@@ -442,7 +482,7 @@ OVERVIEW
     match '/completed' => 'todos#completed', :as => :completed
 
 12.10 Links for open and completed page for signed in users
-  app/layouts/application.html.erb (line 31)
+  app/layouts/application.html.erb (in the top-nav, around line 31)
     <% if user_signed_in? %>
       <li><%= link_to "Open", todos_path  %></li>
       <li><%= link_to "Completed", completed_path  %></li>
@@ -461,10 +501,15 @@ OVERVIEW
 
 13.4 Created at (pretty dates with stamp gem)
   Gemfile
-    gem "stamp"
+    gem "stamp", '0.1.6'
   $ bundle install
   views/todos/index.html
     line 20 <td><%= todo.created_at.stamp("July 4, 1776") %></td>
+  views/todos/show.html.erb
+    line 24 <li><%= note.content %> <em><%= note.created_at.stamp("July 4 '76") %></em></li>
+
+13.5 VIEW THE CHANGES
+  Start server
 
 14.0 Deploy completed app to heroku
 
@@ -478,3 +523,10 @@ OVERVIEW
   $ git push heroku master
 
 15.0 Add features and try things on your own
+
+15.1 Extra Credit! (provided there's still time)
+  create your own static page.
+  Update the footer
+  Include an image (there's already a rails.png)
+  Display user's email in sidebar
+  Translate something to spanish
